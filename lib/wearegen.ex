@@ -11,7 +11,7 @@ defmodule WeAre.Generator do
     {:ok, data} = YamlElixir.read_from_string(yaml)
 
     # Generate a random number of items based on the YAML data
-    items = Enum.map(1..Enum.random(1..10), fn _ -> generate_item(data) end)
+    items = Enum.map(5..Enum.random(5..15), fn _ -> generate_item(data) end)
 
     # Return the items in a map
     %{items: items}
