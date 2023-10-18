@@ -22,7 +22,7 @@ defmodule WeAreGen.MixProject do
   defp deps do
     [
       {:jason, "~> 1.2"},
-      {:yaml_elixir, "~> 1.4"}
+      {:yaml_elixir, "~> 2.0.0"}
     ]
   end
 end
