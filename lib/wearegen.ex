@@ -6,7 +6,7 @@ defmodule WeAre.Generator do
   # Each item has random properties and a name taken from a YAML file.
   def generate_items do
     # Read the YAML file
-    {:ok, yaml} = File.read("./lib/names.yaml")
+    {:ok, yaml} = File.read(Application.app_dir(:wearegen, "priv/names.yaml"))
     # Parse the YAML data
     {:ok, data} = YamlElixir.read_from_string(yaml)
 
@@ -19,7 +19,7 @@ defmodule WeAre.Generator do
 
   # The generate_item function generates a single item with random properties.
   # The game_name and i18n names are taken from a randomly selected game from the YAML data.
-  defp generate_item(data) do
+  def generate_item(data) do
     # Select a random game from the data
     game = Enum.random(data)
 
