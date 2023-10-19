@@ -1,1 +1,0 @@
-WeAre.Exporter.run();
