@@ -1,35 +1,42 @@
-# The WeAre.Generator module provides functions to generate a list of items with random properties.
-# The names for the items are taken from a YAML file.
 defmodule WeAre.Generator do
 
-  # The generate_items function generates a map containing a list of items.
-  # Each item has random properties and a name taken from a YAML file.
-  def generate_items do
-    # Read the YAML file
+  def generate_items(n \\ 20) when n >= 8 do
     {:ok, yaml} = File.read(Application.app_dir(:wearegen, "priv/names.yaml"))
-    # Parse the YAML data
     {:ok, data} = YamlElixir.read_from_string(yaml)
 
-    # Generate a random number of items based on the YAML data
-    items = Enum.map(5..Enum.random(5..15), fn _ -> generate_item(data) end)
+    required_items = [
+      generate_item(data, "slots", :past, 1),
+      generate_item(data, "slots", :past, 0),
+      generate_item(data, "slots", :future, 1),
+      generate_item(data, "slots", :future, 0),
+      generate_item(data, "non-rng", :past, 1),
+      generate_item(data, "non-rng", :past, 0),
+      generate_item(data, "non-rng", :future, 1),
+      generate_item(data, "non-rng", :future, 0)
+    ]
 
-    # Return the items in a map
-    %{items: items}
+    random_items = Enum.map(9..Enum.random(9..n), fn _ -> generate_random_item(data) end)
+
+    %{items: required_items ++ random_items}
   end
 
-  # The generate_item function generates a single item with random properties.
-  # The game_name and i18n names are taken from a randomly selected game from the YAML data.
-  def generate_item(data) do
-    # Select a random game from the data
-    game = Enum.random(data)
+  defp generate_random_item(data) do
+    type = Enum.random(["slots", "non-rng"])
+    time_period = Enum.random([:past, :future])
+    active = Enum.random([0, 1])
 
+    generate_item(data, type, time_period, active)
+  end
+
+  def generate_item(data, type, time_period, active) do
+    game = Enum.random(data)
     game_name = game["identifier"]
-    # Construct the item
+
     %{
       "game_name" => game_name,
-      "type" => Enum.random(["slots", "non-rng"]),
-      "active" => Enum.random([0, 1]),
-      "release_date" => generate_date(),
+      "type" => type,
+      "active" => active,
+      "release_date" => generate_date(time_period),
       "details" => %{
         "method" => generate_string(5),
         "popularity" => Enum.random(0..100),
@@ -42,7 +49,6 @@ defmodule WeAre.Generator do
     }
   end
 
-  # The generate_string function generates a random string of the given length.
   defp generate_string(length \\ 10) do
     :crypto.strong_rand_bytes(length)
     |> Base.encode16()
@@ -50,18 +56,15 @@ defmodule WeAre.Generator do
     |> String.downcase()
   end
 
-  # The generate_date function generates a random date string in the "year-month-day" format.
-  defp generate_date do
-    # Generate a random number of days (up to a year)
-    days = Enum.random(-365..365)
+  defp generate_date(time_period) do
+    days = case time_period do
+      :past -> Enum.random(-365..-1)
+      :future -> Enum.random(1..365)
+    end
 
-    # Get the current date
     date = Date.utc_today()
-
-    # Add the random number of days to the current date
     new_date = Date.add(date, days)
 
-    # Convert the date to a string in the "year-month-day" format
     Date.to_string(new_date)
   end
 
