@@ -28,7 +28,7 @@ defmodule WeAre.Generator do
     generate_item(data, type, time_period, active)
   end
 
-  def generate_item(data, type, time_period, active) do
+  defp generate_item(data, type, time_period, active) do
     game = Enum.random(data)
     game_name = game["identifier"]
 
